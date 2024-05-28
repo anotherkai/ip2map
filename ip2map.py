@@ -1,4 +1,4 @@
-# Required imports
+import sys
 import ipaddress
 import requests
 import socket
@@ -77,8 +77,8 @@ def ip_to_map(ip_or_domain):
     hostname = ip_info.get('hostname', 'Unknown')
     zoom = 17
 
-    if bogon:
-        raise ValueError('IP must be a valid public IPv4/IPv6.')
+    if bogon or ip_or_domain == 'localhost':
+        raise ValueError('IP must be a valid public IPv4/IPv6. Bogon IPs will not work.')
 
     x, y = deg2num(latitude, longitude, zoom)
 
@@ -107,4 +107,9 @@ def ip_to_map(ip_or_domain):
     file_path = f'ip_map_{ip_or_domain}.png'
     combined_image.save(file_path, format='PNG')
 
-    print(f'File saved at {file_path}')
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python ip_geolocation_to_map.py [IP_ADDRESS]")
+        sys.exit(1)
+
+    ip_to_map(sys.argv[1])
